@@ -1,0 +1,3 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
