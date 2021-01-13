@@ -31,6 +31,7 @@ import org.springframework.r2dbc.core.awaitOne
 import org.springframework.r2dbc.core.awaitOneOrNull
 import org.springframework.r2dbc.core.flow
 import org.springframework.test.context.junit4.SpringRunner
+import pl.treksoft.e4k.query.query
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -82,6 +83,38 @@ open class ExecuteTest : SqlTest() {
             val smiths2 = dbClient.execute<User>("SELECT * FROM users WHERE username = ?")
                 .bind(0, "jsmith").fetch().flow().toList()
             assertEquals(1, smiths2.size, "should return correct number of rows selected with an indexed condition")
+        }
+    }
+
+    @Test
+    fun `should select values using query builder`() {
+        runBlocking {
+            val query = query {
+                select("SELECT * FROM users")
+                whereGroup {
+                    where("username = :username")
+                    parameter("username", "jsmith")
+                    where("password = :password")
+                    parameter("password", "pass")
+                    where("name = :name")
+                    parameter("name", "John Smith")
+                }
+            }
+            val users = dbClient.execute<User>(query).flow().toList()
+            assertEquals(1, users.size, "should return one record")
+            val emptyQuery = query {
+                select("SELECT * FROM users")
+                whereGroup {
+                    where("username = :username")
+                    parameter("username", "jsmith")
+                    where("password = :password")
+                    parameter("password", "pass")
+                    where("name = :name")
+                    parameter("name", "James Bond")
+                }
+            }
+            val emptyUsers = dbClient.execute<User>(emptyQuery).flow().toList()
+            assertEquals(0, emptyUsers.size, "should return no records")
         }
     }
 

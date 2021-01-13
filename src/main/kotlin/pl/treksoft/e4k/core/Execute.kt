@@ -32,6 +32,8 @@ fun DatabaseClient.GenericExecuteSpec.bindMap(parameters: Map<String, Any?>): Da
     return parameters.entries.fold(this) { spec, entry ->
         if (entry.value == null) {
             spec.bindNull(entry.key, String::class.java)
+        } else if (entry.value is Parameter) {
+            spec.bind(entry.key, entry.value!! as Parameter)
         } else {
             spec.bind(entry.key, Parameter.fromOrEmpty(entry.value, entry.value!!::class.java))
         }
@@ -42,6 +44,8 @@ fun DatabaseClient.GenericExecuteSpec.bindIndexedMap(parameters: Map<Int, Any?>)
     return parameters.entries.fold(this) { spec, entry ->
         if (entry.value == null) {
             spec.bindNull(entry.key, String::class.java)
+        } else if (entry.value is Parameter) {
+            spec.bind(entry.key, entry.value!! as Parameter)
         } else {
             spec.bind(entry.key, Parameter.fromOrEmpty(entry.value, entry.value!!::class.java))
         }
@@ -49,6 +53,14 @@ fun DatabaseClient.GenericExecuteSpec.bindIndexedMap(parameters: Map<Int, Any?>)
 }
 
 fun DbClient.execute(sql: String) = databaseClient.sql(sql)
+
+fun DbClient.execute(sql: String, parameters: Map<String, Any?>): DatabaseClient.GenericExecuteSpec {
+    return databaseClient.sql(sql).bindMap(parameters)
+}
+
+fun DbClient.execute(query: Query): DatabaseClient.GenericExecuteSpec {
+    return execute(query.sql, query.parameters)
+}
 
 inline fun <reified T : Any> DbClient.execute(
     sql: String
@@ -58,11 +70,25 @@ inline fun <reified T : Any> DbClient.execute(
 
 interface BindSpec<T : Any> {
     fun bind(index: Int, value: Any): BindSpec<T>
+    fun bind(index: Int, value: Any?, type: Class<*>): BindSpec<T>
     fun bindNull(index: Int, type: Class<*>): BindSpec<T>
     fun bind(name: String, value: Any): BindSpec<T>
+    fun bind(name: String, value: Any?, type: Class<*>): BindSpec<T>
     fun bindNull(name: String, type: Class<*>): BindSpec<T>
     fun fetch(): RowsFetchSpec<T>
 }
+
+inline fun <reified T : Any> BindSpec<T>.bindNullable(index: Int, value: T? = null) =
+    bind(index, value, T::class.java)
+
+inline fun <reified T : Any> BindSpec<T>.bindNullable(name: String, value: T? = null) =
+    bind(name, value, T::class.java)
+
+inline fun <reified T : Any> DatabaseClient.GenericExecuteSpec.bindNullable(index: Int, value: T? = null) =
+    bind(index, Parameter.fromOrEmpty(value, T::class.java))
+
+inline fun <reified T : Any> DatabaseClient.GenericExecuteSpec.bindNullable(name: String, value: T? = null) =
+    bind(name, Parameter.fromOrEmpty(value, T::class.java))
 
 @PublishedApi
 internal class BindSpecImpl<T : Any>(
@@ -79,8 +105,13 @@ internal class BindSpecImpl<T : Any>(
         return this
     }
 
+    override fun bind(index: Int, value: Any?, type: Class<*>): BindSpec<T> {
+        indexedParameters[index] = Parameter.fromOrEmpty(value, type)
+        return this
+    }
+
     override fun bindNull(index: Int, type: Class<*>): BindSpec<T> {
-        indexedParameters[index] = null
+        indexedParameters[index] = Parameter.empty(type)
         return this
     }
 
@@ -89,8 +120,13 @@ internal class BindSpecImpl<T : Any>(
         return this
     }
 
+    override fun bind(name: String, value: Any?, type: Class<*>): BindSpec<T> {
+        namedParameters[name] = Parameter.fromOrEmpty(value, type)
+        return this
+    }
+
     override fun bindNull(name: String, type: Class<*>): BindSpec<T> {
-        namedParameters[name] = null
+        namedParameters[name] = Parameter.empty(type)
         return this
     }
 
@@ -114,5 +150,5 @@ inline fun <reified T : Any> DbClient.execute(
 inline fun <reified T : Any> DbClient.execute(
     query: Query
 ): RowsFetchSpec<T> {
-    return execute(query.sql, query.parameters)
+    return execute<T>(query.sql, query.parameters)
 }

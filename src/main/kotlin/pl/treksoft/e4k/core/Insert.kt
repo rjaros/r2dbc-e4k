@@ -26,6 +26,7 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.data.r2dbc.core.ReactiveInsertOperation
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.FetchSpec
+import org.springframework.r2dbc.core.Parameter
 import org.springframework.r2dbc.core.RowsFetchSpec
 import org.springframework.r2dbc.core.awaitOne
 import reactor.core.publisher.Mono
@@ -59,12 +60,17 @@ private class InsertIntoSpecImpl(private val dbClient: DbClient) : InsertIntoSpe
 }
 
 interface InsertValuesSpec {
-    fun value(field: String, value: Any?): InsertValuesSpec
+    fun value(field: String, value: Any): InsertValuesSpec
+    fun value(field: String, value: Any?, type: Class<*>): InsertValuesSpec
     fun nullValue(field: String): InsertValuesSpec
+    fun nullValue(field: String, type: Class<*>): InsertValuesSpec
     fun fetch(): FetchSpec<out Any>
     fun then(): Mono<Void>
     suspend fun await()
 }
+
+inline fun <reified T : Any> InsertValuesSpec.valueNullable(field: String, value: T? = null) =
+    value(field, value, T::class.java)
 
 private class InsertValuesSpecImpl(
     private val dbClient: DbClient,
@@ -72,13 +78,23 @@ private class InsertValuesSpecImpl(
 ) : InsertValuesSpec {
     val values = mutableMapOf<String, Any?>()
 
-    override fun value(field: String, value: Any?): InsertValuesSpec {
+    override fun value(field: String, value: Any): InsertValuesSpec {
         values[field] = value
+        return this
+    }
+
+    override fun value(field: String, value: Any?, type: Class<*>): InsertValuesSpec {
+        values[field] = Parameter.fromOrEmpty(value, type)
         return this
     }
 
     override fun nullValue(field: String): InsertValuesSpec {
         values[field] = null
+        return this
+    }
+
+    override fun nullValue(field: String, type: Class<*>): InsertValuesSpec {
+        values[field] = Parameter.empty(type)
         return this
     }
 
@@ -104,12 +120,18 @@ private class InsertValuesSpecImpl(
 }
 
 interface InsertValuesKeySpec {
-    fun value(field: String, value: Any?): InsertValuesKeySpec
+    fun value(field: String, value: Any): InsertValuesKeySpec
+    fun value(field: String, value: Any?, type: Class<*>): InsertValuesKeySpec
     fun nullValue(field: String): InsertValuesKeySpec
+    fun nullValue(field: String, type: Class<*>): InsertValuesKeySpec
     fun then(): Mono<Void>
     fun fetch(): RowsFetchSpec<Int>
     suspend fun awaitOne(): Int
 }
+
+inline fun <reified T : Any> InsertValuesKeySpec.valueNullable(field: String, value: T? = null) =
+    value(field, value, T::class.java)
+
 
 private class InsertValuesKeySpecImpl(
     private val dbClient: DbClient,
@@ -118,13 +140,23 @@ private class InsertValuesKeySpecImpl(
 ) : InsertValuesKeySpec {
     val values = mutableMapOf<String, Any?>()
 
-    override fun value(field: String, value: Any?): InsertValuesKeySpec {
+    override fun value(field: String, value: Any): InsertValuesKeySpec {
         values[field] = value
+        return this
+    }
+
+    override fun value(field: String, value: Any?, type: Class<*>): InsertValuesKeySpec {
+        values[field] = Parameter.fromOrEmpty(value, type)
         return this
     }
 
     override fun nullValue(field: String): InsertValuesKeySpec {
         values[field] = null
+        return this
+    }
+
+    override fun nullValue(field: String, type: Class<*>): InsertValuesKeySpec {
+        values[field] = Parameter.empty(type)
         return this
     }
 

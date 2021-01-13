@@ -23,6 +23,7 @@
  */
 package pl.treksoft.e4k.query
 
+import org.springframework.r2dbc.core.Parameter
 import java.util.*
 
 /**
@@ -49,8 +50,16 @@ class QueryBuilder {
         selects.add(table)
     }
 
-    fun parameter(name: String, value: Any?) {
+    fun parameter(name: String, value: Any) {
         params[name] = value
+    }
+
+    fun parameter(name: String, value: Any?, type: Class<*>) {
+        params[name] = Parameter.fromOrEmpty(value, type)
+    }
+
+    fun parameterNull(name: String, type: Class<*>) {
+        params[name] = Parameter.empty(type)
     }
 
     fun groupBy(groupBy: String) {
@@ -132,6 +141,10 @@ class QueryBuilder {
             }
         }
     }
+}
+
+inline fun <reified T : Any> QueryBuilder.parameterNullable(name: String, value: T? = null) {
+    parameter(name, value, T::class.java)
 }
 
 fun query(sb: StringBuilder = StringBuilder(), block: QueryBuilder.() -> Unit): Query {

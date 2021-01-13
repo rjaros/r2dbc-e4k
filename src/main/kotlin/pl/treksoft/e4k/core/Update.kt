@@ -28,6 +28,7 @@ import org.springframework.data.relational.core.query.Query.query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.FetchSpec
+import org.springframework.r2dbc.core.Parameter
 import pl.treksoft.e4k.query.Query
 import reactor.core.publisher.Mono
 
@@ -86,10 +87,18 @@ private class UpdateTableSpecImpl(private val dbClient: DbClient) : UpdateTableS
 
 interface SetterSpec {
     val Update: SetterSpec
-    fun update(field: String, value: Any?): UpdateValuesSpec
-    fun set(field: String, value: Any?): UpdateValuesSpec
+    fun update(field: String, value: Any): UpdateValuesSpec
+    fun update(field: String, value: Any?, type: Class<*>): UpdateValuesSpec
+    fun set(field: String, value: Any): UpdateValuesSpec
+    fun set(field: String, value: Any?, type: Class<*>): UpdateValuesSpec
     fun set(parameters: Map<String, Any?>): UpdateValuesSpec
 }
+
+inline fun <reified T : Any> SetterSpec.updateNullable(field: String, value: T? = null) =
+    update(field, value, T::class.java)
+
+inline fun <reified T : Any> SetterSpec.setNullable(field: String, value: T? = null) =
+    set(field, value, T::class.java)
 
 interface UpdateValuesSpec : SetterSpec {
     fun using(setters: SetterSpec.() -> Unit): UpdateValuesSpec
@@ -116,12 +125,21 @@ private class UpdateValuesSpecImpl(
     override val Update: SetterSpec
         get() = this
 
-    override fun update(field: String, value: Any?): UpdateValuesSpec {
+    override fun update(field: String, value: Any): UpdateValuesSpec {
         return set(field, value)
     }
 
-    override fun set(field: String, value: Any?): UpdateValuesSpec {
+    override fun update(field: String, value: Any?, type: Class<*>): UpdateValuesSpec {
+        return set(field, value, type)
+    }
+
+    override fun set(field: String, value: Any): UpdateValuesSpec {
         values[field] = value
+        return this
+    }
+
+    override fun set(field: String, value: Any?, type: Class<*>): UpdateValuesSpec {
+        values[field] = Parameter.fromOrEmpty(value, type)
         return this
     }
 
