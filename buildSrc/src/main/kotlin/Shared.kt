@@ -1,3 +1,4 @@
+import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPom
@@ -5,17 +6,12 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.withType
+import org.gradle.plugins.signing.SigningExtension
 
 fun Project.repositories() {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-        maven { url = uri("https://kotlin.bintray.com/kotlinx") }
-        maven { url = uri("https://dl.bintray.com/kotlin/kotlin-js-wrappers") }
-        maven { url = uri("https://dl.bintray.com/kotlin/kotlin-dev") }
-        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
-        maven { url = uri("https://dl.bintray.com/rjaros/kotlin") }
         mavenLocal()
     }
 }
@@ -45,23 +41,25 @@ fun MavenPom.defaultPom() {
     }
 }
 
-fun Project.setupPublication() {
-    plugins.apply("maven-publish")
+fun Project.setupSigning() {
+    extensions.getByType<SigningExtension>().run {
+        sign(extensions.getByType<PublishingExtension>().publications)
+    }
+}
 
+fun Project.setupPublication() {
     extensions.getByType<PublishingExtension>().run {
         publications.withType<MavenPublication>().all {
             pom {
                 defaultPom()
             }
         }
-
+    }
+    extensions.getByType<NexusPublishExtension>().run {
         repositories {
-            maven {
-                url = uri("https://api.bintray.com/maven/rjaros/kotlin/${project.name}/;publish=0;override=1")
-                credentials {
-                    username = findProperty("buser")?.toString()
-                    password = findProperty("bkey")?.toString()
-                }
+            sonatype {
+                username.set(findProperty("ossrhUsername")?.toString())
+                password.set(findProperty("ossrhPassword")?.toString())
             }
         }
     }

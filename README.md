@@ -2,7 +2,6 @@
 
 Kotlin extensions for Spring Data R2DBC
 
-[![Download](https://api.bintray.com/packages/rjaros/kotlin/r2dbc-e4k/images/download.svg) ](https://bintray.com/rjaros/kotlin/kvision/_latestVersion)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Introduction
@@ -123,17 +122,12 @@ val rowsDeleted = dbClient.delete().from("users")
 
 ## Using
 
-The artifacts for this project are available on Bintray.
+The artifacts of this project are published to Maven Central.
 To use it in your project add the following code in your `build.gradle.kts` file.
-
-    repositories {
-        ...
-        maven { url = uri("https://dl.bintray.com/rjaros/kotlin") }
-    }
 
     dependencies {
         ...
-        implementation("pl.treksoft:r2dbc-e4k:0.0.1")
+        implementation("pl.treksoft:r2dbc-e4k:0.1.0")
     }
 
 The `DbClient` bean is automatically available to your Spring application. Inject it inside your components instead of `DatabaseClient` from Spring Data R2DBC.

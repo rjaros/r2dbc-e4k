@@ -3,7 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     id("maven-publish")
-
+    id("signing")
+    id("de.marcphilipp.nexus-publish")
+    id("org.jetbrains.dokka") version "1.4.20"
 }
 
 repositories()
@@ -37,11 +39,18 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(kotlin.sourceSets.main.get().kotlin)
 }
 
+val javadocJar by tasks.registering(Jar::class) {
+    dependsOn("dokkaJavadoc")
+    archiveClassifier.set("javadoc")
+    from("$buildDir/dokka/javadoc")
+}
+
 publishing {
     publications {
         create<MavenPublication>("kotlin") {
             from(components["kotlin"])
             artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
             pom {
                 defaultPom()
             }
@@ -49,6 +58,7 @@ publishing {
     }
 }
 
+setupSigning()
 setupPublication()
 
 tasks.withType<Test> {
