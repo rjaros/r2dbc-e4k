@@ -80,7 +80,7 @@ open class UpdateTest : SqlTest() {
                 .await()
             val user = dbClient.execute<User>("SELECT * FROM users WHERE username = :username").bind("username", "nick")
                 .fetch().awaitOne()
-            assertNotNull(user.id)
+            assertNotNull(user.userId)
             assertEquals("nick", user.username)
             assertEquals("pass", user.password)
             assertEquals("John Smith", user.name)
@@ -88,7 +88,7 @@ open class UpdateTest : SqlTest() {
             assertNull(user.createdAt)
             assertNull(user.active)
             val now = OffsetDateTime.now()
-            val oldId = user.id
+            val oldId = user.userId
             val newUser = user.copy(description = "description", createdAt = now, active = true)
             val rowsUpdated =
                 dbClient.update().table<User>().inTable("users").using(newUser, dbClient).awaitSingle()
@@ -96,8 +96,8 @@ open class UpdateTest : SqlTest() {
             val changedUser =
                 dbClient.execute<User>("SELECT * FROM users WHERE username = :username").bind("username", "nick")
                     .fetch().awaitOne()
-            assertNotNull(changedUser.id)
-            assertEquals(oldId, changedUser.id)
+            assertNotNull(changedUser.userId)
+            assertEquals(oldId, changedUser.userId)
             assertEquals("nick", changedUser.username)
             assertEquals("pass", changedUser.password)
             assertEquals("John Smith", changedUser.name)

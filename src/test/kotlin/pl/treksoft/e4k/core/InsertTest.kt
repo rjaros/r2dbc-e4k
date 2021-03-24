@@ -41,7 +41,7 @@ open class InsertTest : SqlTest() {
     fun `should insert records without entity class`() {
         runBlocking {
             val count1 = dbClient.execute<Int>("SELECT COUNT(*) FROM users").fetch().awaitOne()
-            val id = dbClient.insert().into("users", "id")
+            val id = dbClient.insert().into("users", "user_id")
                 .value("username", "nick")
                 .value("password", "pass")
                 .value("name", "John Smith")
@@ -73,7 +73,7 @@ open class InsertTest : SqlTest() {
                         createdAt = OffsetDateTime.now()
                     )
                 ).awaitSingle()
-            assertTrue(user.id!! > 0, "should return user with correct id value")
+            assertTrue(user.userId!! > 0, "should return user with correct id value")
             val user2 = dbClient.insert().into<User>().into("users")
                 .using(
                     User(
@@ -84,7 +84,7 @@ open class InsertTest : SqlTest() {
                         active = false
                     )
                 ).awaitSingle()
-            assertTrue(user2.id!! > 0, "should return second user with correct id value")
+            assertTrue(user2.userId!! > 0, "should return second user with correct id value")
             val count2 = dbClient.execute<Int>("SELECT COUNT(*) FROM users").fetch().awaitOne()
             assertEquals(2, count2 - count1, "should find two new records")
         }

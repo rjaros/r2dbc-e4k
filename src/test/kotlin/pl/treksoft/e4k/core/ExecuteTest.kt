@@ -45,7 +45,7 @@ open class ExecuteTest : SqlTest() {
         runBlocking {
             val count = dbClient.execute<Int>("SELECT COUNT(*) FROM users").fetch().awaitOne()
             assertEquals(1, count, "should return number of records")
-            val id = dbClient.execute<Int>("SELECT id FROM users WHERE username = :username").bind("username", "jsmith")
+            val id = dbClient.execute<Int>("SELECT user_id FROM users WHERE username = :username").bind("username", "jsmith")
                 .fetch().awaitOne()
             assertTrue(id > 0, "should return correct id of the user")
             val map = dbClient.execute("SELECT name, description FROM users WHERE username = :username")
@@ -74,9 +74,9 @@ open class ExecuteTest : SqlTest() {
                 .bind("username", "jsmith").fetch().awaitOneOrNull()
             assertNotNull(firstSmith, "should select single row")
             val computedUser =
-                dbClient.execute<User>("SELECT 5 as id, 'jbond' as username, 'pass' as password, 'James Bond' as name")
+                dbClient.execute<User>("SELECT 5 as user_id, 'jbond' as username, 'pass' as password, 'James Bond' as name")
                     .fetch().awaitOne()
-            assertEquals(5, computedUser.id, "should return correct values of the computed record")
+            assertEquals(5, computedUser.userId, "should return correct values of the computed record")
             assertEquals("jbond", computedUser.username, "should return correct values of the computed record")
             assertEquals("pass", computedUser.password, "should return correct values of the computed record")
             assertEquals("James Bond", computedUser.name, "should return correct values of the computed record")

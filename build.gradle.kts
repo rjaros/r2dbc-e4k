@@ -5,20 +5,21 @@ plugins {
     id("maven-publish")
     id("signing")
     id("de.marcphilipp.nexus-publish")
-    id("org.jetbrains.dokka") version "1.4.20"
+    id("org.jetbrains.dokka") version "1.4.30"
 }
 
 repositories()
 
+val javaVersion: String by project
 val coroutinesVersion: String by project
 val springDataR2dbcVersion: String by project
 val r2dbcH2Version: String by project
 val springBootVersion: String by project
 
 val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions.jvmTarget = "1.8"
+compileKotlin.kotlinOptions.jvmTarget = javaVersion
 val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
+compileTestKotlin.kotlinOptions.jvmTarget = javaVersion
 
 dependencies {
     implementation(kotlin("reflect"))

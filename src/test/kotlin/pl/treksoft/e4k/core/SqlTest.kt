@@ -32,7 +32,7 @@ import kotlin.test.BeforeTest
 
 data class User(
     @Id
-    val id: Int? = null,
+    val userId: Int? = null,
     val username: String,
     val password: String,
     val name: String,
@@ -51,14 +51,14 @@ open class SqlTest {
             dbClient.execute(
                 """
                     CREATE TABLE IF NOT EXISTS users (
-                      id serial NOT NULL,
+                      user_id serial NOT NULL,
                       username varchar(255) NOT NULL,
                       password varchar(255) NOT NULL,
                       name varchar(255) NOT NULL,
                       description varchar(255),                    
                       created_at TIMESTAMP WITH TIME ZONE,
                       active BOOLEAN,
-                      PRIMARY KEY (id),
+                      PRIMARY KEY (user_id),
                       UNIQUE(username)
                     );
                     INSERT INTO users (username, password, name, description, created_at, active) 

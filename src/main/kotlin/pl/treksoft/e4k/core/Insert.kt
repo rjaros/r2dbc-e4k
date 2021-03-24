@@ -171,7 +171,7 @@ private class InsertValuesKeySpecImpl(
         val sql = "INSERT INTO $table ($names) VALUES ($namedArguments)"
         val executeSpec = dbClient.databaseClient.sql(sql).bindMap(values)
         return executeSpec.filter { s -> s.returnGeneratedValues(idColumn) }.map { row ->
-            row.get("id", Integer::class.java)?.toInt()
+            row.get(idColumn, Integer::class.java)?.toInt()
         }
     }
 
