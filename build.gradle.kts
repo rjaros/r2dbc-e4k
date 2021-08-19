@@ -5,7 +5,7 @@ plugins {
     id("maven-publish")
     id("signing")
     id("de.marcphilipp.nexus-publish")
-    id("org.jetbrains.dokka") version "1.4.30"
+    id("org.jetbrains.dokka") version "1.5.0"
 }
 
 repositories()
