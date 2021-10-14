@@ -22,6 +22,7 @@
 
 package pl.treksoft.e4k.core
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.r2dbc.convert.MappingR2dbcConverter
@@ -32,6 +33,11 @@ import org.springframework.r2dbc.core.DatabaseClient
 open class DbClientConfiguration {
 
     @Bean
+    @ConditionalOnProperty(
+        value = arrayOf("r2dbc-e4k.autoconfigure"),
+        havingValue = "true",
+        matchIfMissing = true
+    )
     open fun dbClient(
         databaseClient: DatabaseClient,
         r2dbcEntityTemplate: R2dbcEntityTemplate,
