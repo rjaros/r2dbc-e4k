@@ -4,8 +4,8 @@ plugins {
     kotlin("jvm")
     id("maven-publish")
     id("signing")
-    id("de.marcphilipp.nexus-publish")
-    id("org.jetbrains.dokka") version "1.5.0"
+    id("io.github.gradle-nexus.publish-plugin")
+    id("org.jetbrains.dokka") version "1.5.31"
 }
 
 repositories()
@@ -26,6 +26,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$coroutinesVersion")
+    implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
     implementation("org.springframework.data:spring-data-r2dbc:$springDataR2dbcVersion")
     implementation("io.r2dbc:r2dbc-h2:$r2dbcH2Version")
 
