@@ -26,6 +26,9 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
+import java.util.*
 
 fun Map<String, Any?>.bool(name: String): Boolean = this.boolOrNull(name)!!
 
@@ -40,6 +43,7 @@ fun Map<String, Any?>.intOrNull(name: String): Int? {
     return when (v) {
         is Integer -> v.toInt()
         is java.lang.Short -> v.toInt()
+        is java.lang.Long -> v.toInt()
         else -> null
     }
 }
@@ -68,7 +72,22 @@ fun Map<String, Any?>.datetime(name: String): LocalDateTime = this.datetimeOrNul
 fun Map<String, Any?>.datetimeOrNull(name: String): LocalDateTime? =
     (this[name] as? LocalDateTime)
 
+fun Map<String, Any?>.offsetTime(name: String): OffsetTime = this.offsetTimeOrNull(name)!!
+
+fun Map<String, Any?>.offsetTimeOrNull(name: String): OffsetTime? =
+    (this[name] as? OffsetTime)
+
+fun Map<String, Any?>.offsetDatetime(name: String): OffsetDateTime = this.offsetDatetimeOrNull(name)!!
+
+fun Map<String, Any?>.offsetDatetimeOrNull(name: String): OffsetDateTime? =
+    (this[name] as? OffsetDateTime)
+
 fun Map<String, Any?>.bigDecimal(name: String): BigDecimal = this.bigDecimalOrNull(name)!!
 
 fun Map<String, Any?>.bigDecimalOrNull(name: String): BigDecimal? =
     (this[name] as? BigDecimal)
+
+fun Map<String, Any?>.uuid(name: String): UUID = this.uuidOrNull(name)!!
+
+fun Map<String, Any?>.uuidOrNull(name: String): UUID? =
+    (this[name] as? UUID)

@@ -27,6 +27,9 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
+import java.util.*
 
 fun Row.bool(name: String): Boolean = this.boolOrNull(name)!!
 
@@ -40,6 +43,7 @@ fun Row.intOrNull(name: String): Int? {
     return when (v) {
         is Integer -> v.toInt()
         is java.lang.Short -> v.toInt()
+        is java.lang.Long -> v.toInt()
         else -> null
     }
 }
@@ -63,7 +67,22 @@ fun Row.time(name: String): LocalTime = this.timeOrNull(name)!!
 fun Row.timeOrNull(name: String): LocalTime? =
     this.get(name, LocalTime::class.java)
 
+fun Row.offsetDatetime(name: String): OffsetDateTime = this.offsetDatetimeOrNull(name)!!
+
+fun Row.offsetDatetimeOrNull(name: String): OffsetDateTime? =
+    this.get(name, OffsetDateTime::class.java)
+
+fun Row.offsetTime(name: String): OffsetTime = this.offsetTimeOrNull(name)!!
+
+fun Row.offsetTimeOrNull(name: String): OffsetTime? =
+    this.get(name, OffsetTime::class.java)
+
 fun Row.bigDecimal(name: String): BigDecimal = this.bigDecimalOrNull(name)!!
 
 fun Row.bigDecimalOrNull(name: String): BigDecimal? =
     this.get(name, BigDecimal::class.java)
+
+fun Row.uuid(name: String): UUID = this.uuidOrNull(name)!!
+
+fun Row.uuidOrNull(name: String): UUID? =
+    this.get(name, UUID::class.java)

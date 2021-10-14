@@ -33,7 +33,7 @@ import java.util.*
  * It is not a type-safe builder, it simply allows fragments of an SQL statement
  * to be added in any order and then builds the statement.
  *
- * The main feature is provides is allowing where clauses to be combined with
+ * The main feature it provides is allowing where clauses to be combined with
  * an operator, taking care of cases where groups end up being empty.
  */
 class QueryBuilder {

@@ -127,7 +127,7 @@ To use it in your project add the following code in your `build.gradle.kts` file
 
     dependencies {
         ...
-        implementation("pl.treksoft:r2dbc-e4k:0.1.0")
+        implementation("pl.treksoft:r2dbc-e4k:0.2.0")
     }
 
 The `DbClient` bean is automatically available to your Spring application. Inject it inside your components instead of `DatabaseClient` from Spring Data R2DBC.
