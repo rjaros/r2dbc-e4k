@@ -288,8 +288,34 @@ class QueryBuilderTest {
         }
     }
 
+    @Test
+    fun `should support counting with where clause with params`() {
+        assertSqlCount(
+            setOf("first_name", "last_name"), """
+           select count(*) from actor
+           where first_name = :first_name and last_name = :last_name
+        """
+        )
+        {
+            selectCount("select count(*) from actor")
+            whereGroup {
+                where("first_name = :first_name")
+                parameter("first_name", "Kate")
+
+                where("last_name = :last_name")
+                parameter("last_name", "Beckinsale")
+            }
+        }
+    }
+
     fun assertSql(expectedParams: Set<String>, expectedSql: String, block: QueryBuilder.() -> Unit) {
         val query = QueryBuilder().build(block = block)
+        assertEquals(expectedParams, query.parameters.keys)
+        assertEquals(expectedSql.trimIndent(), query.sql.replace(" $".toRegex(RegexOption.MULTILINE), ""))
+    }
+
+    fun assertSqlCount(expectedParams: Set<String>, expectedSql: String, block: QueryBuilder.() -> Unit) {
+        val query = QueryBuilder().buildCount(block = block)
         assertEquals(expectedParams, query.parameters.keys)
         assertEquals(expectedSql.trimIndent(), query.sql.replace(" $".toRegex(RegexOption.MULTILINE), ""))
     }

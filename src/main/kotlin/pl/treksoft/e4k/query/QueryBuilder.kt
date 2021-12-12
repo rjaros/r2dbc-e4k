@@ -24,7 +24,6 @@
 package pl.treksoft.e4k.query
 
 import org.springframework.r2dbc.core.Parameter
-import java.util.*
 
 /**
  * QueryBuilder is a simple SQL query builder to ease building dynamic queries
@@ -38,6 +37,7 @@ import java.util.*
  */
 class QueryBuilder {
     private val selects = LinkedHashSet<String>()
+    private var selectCount: String? = null
     private val params = mutableMapOf<String, Any?>()
     private var filters: Filter.Group = Filter.Group()
     private var groupBy: String? = null
@@ -48,6 +48,10 @@ class QueryBuilder {
 
     fun select(table: String) {
         selects.add(table)
+    }
+
+    fun selectCount(selectCount: String) {
+        this.selectCount = selectCount
     }
 
     fun parameter(name: String, value: Any) {
@@ -119,6 +123,17 @@ class QueryBuilder {
         return Query(sb, params)
     }
 
+    fun buildCount(sb: StringBuilder = StringBuilder(), block: QueryBuilder.() -> Unit): Query {
+        block(this)
+        selectCount?.run { sb.append(selectCount) }
+        if (filters.countLeaves() != 0) {
+            if (selectCount != null) sb.append("\n")
+            sb.append("where ")
+            appendConditions(sb, filters, true)
+        }
+        return Query(sb, params)
+    }
+
     private fun appendConditions(sb: StringBuilder, conditions: Filter, root: Boolean) {
         when (conditions) {
             is Filter.Where -> sb.append(conditions.where)
@@ -149,4 +164,9 @@ inline fun <reified T : Any> QueryBuilder.parameterNullable(name: String, value:
 
 fun query(sb: StringBuilder = StringBuilder(), block: QueryBuilder.() -> Unit): Query {
     return QueryBuilder().build(sb, block)
+}
+
+fun queryWithCount(sb: StringBuilder = StringBuilder(), block: QueryBuilder.() -> Unit): Pair<Query, Query> {
+    val originalString = sb.toString()
+    return QueryBuilder().build(sb, block) to QueryBuilder().buildCount(StringBuilder(originalString), block)
 }
