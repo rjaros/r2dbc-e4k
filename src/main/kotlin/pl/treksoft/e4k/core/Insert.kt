@@ -127,6 +127,8 @@ interface InsertValuesKeySpec {
     fun then(): Mono<Void>
     fun fetch(): RowsFetchSpec<Int>
     suspend fun awaitOne(): Int
+    fun fetchLong(): RowsFetchSpec<Long>
+    suspend fun awaitOneLong(): Long
 }
 
 inline fun <reified T : Any> InsertValuesKeySpec.valueNullable(field: String, value: T? = null) =
@@ -175,7 +177,22 @@ private class InsertValuesKeySpecImpl(
         }
     }
 
+    override fun fetchLong(): RowsFetchSpec<Long> {
+        if (values.isEmpty()) throw IllegalStateException("No values specified")
+        val names = values.keys.joinToString(", ")
+        val namedArguments = values.keys.map { ":$it" }.joinToString(", ")
+        val sql = "INSERT INTO $table ($names) VALUES ($namedArguments)"
+        val executeSpec = dbClient.databaseClient.sql(sql).bindMap(values)
+        return executeSpec.filter { s -> s.returnGeneratedValues(idColumn) }.map { row ->
+            row.get(idColumn, java.lang.Long::class.java)?.toLong()
+        }
+    }
+
     override suspend fun awaitOne(): Int {
         return fetch().awaitOne()
+    }
+
+    override suspend fun awaitOneLong(): Long {
+        return fetchLong().awaitOne()
     }
 }

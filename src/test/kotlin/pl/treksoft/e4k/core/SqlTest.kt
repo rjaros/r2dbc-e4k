@@ -63,6 +63,11 @@ open class SqlTest {
                     );
                     INSERT INTO users (username, password, name, description, created_at, active) 
                     VALUES ('jsmith', 'pass', 'John Smith', 'A test user', CURRENT_TIMESTAMP, true);
+                    CREATE TABLE IF NOT EXISTS logs (
+                      logs_id bigserial NOT NULL,
+                      description varchar(255) NOT NULL,
+                      PRIMARY KEY (logs_id)
+                    );
                 """.trimIndent()
             ).await()
         }
@@ -74,6 +79,7 @@ open class SqlTest {
             dbClient.execute(
                 """
                     DROP TABLE users;
+                    DROP TABLE logs;
                 """.trimIndent()
             ).await()
         }

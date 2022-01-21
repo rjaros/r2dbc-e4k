@@ -89,4 +89,17 @@ open class InsertTest : SqlTest() {
             assertEquals(2, count2 - count1, "should find two new records")
         }
     }
+
+    @Test
+    fun `should insert records with bigserial keys`() {
+        runBlocking {
+            val count1 = dbClient.execute<Int>("SELECT COUNT(*) FROM logs").fetch().awaitOne()
+            val id = dbClient.insert().into("logs", "logs_id")
+                .value("description", "Test entry")
+                .awaitOneLong()
+            assertTrue(id > 0, "should return correct id value")
+            val count2 = dbClient.execute<Int>("SELECT COUNT(*) FROM logs").fetch().awaitOne()
+            assertEquals(1, count2 - count1, "should find one new records")
+        }
+    }
 }
