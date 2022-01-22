@@ -67,6 +67,7 @@ interface InsertValuesSpec {
     fun fetch(): FetchSpec<out Any>
     fun then(): Mono<Void>
     suspend fun await()
+    val values: Map<String, Any?>
 }
 
 inline fun <reified T : Any> InsertValuesSpec.valueNullable(field: String, value: T? = null) =
@@ -76,7 +77,7 @@ private class InsertValuesSpecImpl(
     private val dbClient: DbClient,
     private val table: String
 ) : InsertValuesSpec {
-    val values = mutableMapOf<String, Any?>()
+    override val values = mutableMapOf<String, Any?>()
 
     override fun value(field: String, value: Any): InsertValuesSpec {
         values[field] = value
@@ -129,6 +130,7 @@ interface InsertValuesKeySpec {
     suspend fun awaitOne(): Int
     fun fetchLong(): RowsFetchSpec<Long>
     suspend fun awaitOneLong(): Long
+    val values: Map<String, Any?>
 }
 
 inline fun <reified T : Any> InsertValuesKeySpec.valueNullable(field: String, value: T? = null) =
@@ -140,7 +142,7 @@ private class InsertValuesKeySpecImpl(
     private val table: String,
     private val idColumn: String
 ) : InsertValuesKeySpec {
-    val values = mutableMapOf<String, Any?>()
+    override val values = mutableMapOf<String, Any?>()
 
     override fun value(field: String, value: Any): InsertValuesKeySpec {
         values[field] = value

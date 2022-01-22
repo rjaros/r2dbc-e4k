@@ -92,6 +92,7 @@ interface SetterSpec {
     fun set(field: String, value: Any): UpdateValuesSpec
     fun set(field: String, value: Any?, type: Class<*>): UpdateValuesSpec
     fun set(parameters: Map<String, Any?>): UpdateValuesSpec
+    val values: Map<String, Any?>
 }
 
 inline fun <reified T : Any> SetterSpec.updateNullable(field: String, value: T? = null) =
@@ -120,7 +121,7 @@ private class UpdateValuesSpecImpl(
     private val dbClient: DbClient,
     private val table: String
 ) : UpdateValuesSpec {
-    val values = mutableMapOf<String, Any?>()
+    override val values = mutableMapOf<String, Any?>()
 
     override val Update: SetterSpec
         get() = this
