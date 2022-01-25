@@ -78,11 +78,11 @@ interface BindSpec<T : Any> {
     fun fetch(): RowsFetchSpec<T>
 }
 
-inline fun <reified T : Any> BindSpec<T>.bindNullable(index: Int, value: T? = null) =
-    bind(index, value, T::class.java)
+inline fun <T : Any, reified V : Any> BindSpec<T>.bindNullable(index: Int, value: V? = null) =
+    bind(index, value, V::class.java)
 
-inline fun <reified T : Any> BindSpec<T>.bindNullable(name: String, value: T? = null) =
-    bind(name, value, T::class.java)
+inline fun <T : Any, reified V : Any> BindSpec<T>.bindNullable(name: String, value: V? = null) =
+    bind(name, value, V::class.java)
 
 inline fun <reified T : Any> DatabaseClient.GenericExecuteSpec.bindNullable(index: Int, value: T? = null) =
     bind(index, Parameter.fromOrEmpty(value, T::class.java))
