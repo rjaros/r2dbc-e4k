@@ -24,6 +24,7 @@ package pl.treksoft.e4k.core
 
 import io.r2dbc.spi.Row
 import java.math.BigDecimal
+import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -86,3 +87,8 @@ fun Row.uuid(name: String): UUID = this.uuidOrNull(name)!!
 
 fun Row.uuidOrNull(name: String): UUID? =
     this.get(name, UUID::class.java)
+
+fun Row.byteArray(name: String): ByteArray = this.byteArrayOrNull(name)!!
+
+fun Row.byteArrayOrNull(name: String): ByteArray? =
+    this.get(name, ByteBuffer::class.java)?.array()

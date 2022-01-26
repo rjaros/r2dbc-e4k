@@ -23,6 +23,7 @@
 package pl.treksoft.e4k.core
 
 import java.math.BigDecimal
+import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -91,3 +92,8 @@ fun Map<String, Any?>.uuid(name: String): UUID = this.uuidOrNull(name)!!
 
 fun Map<String, Any?>.uuidOrNull(name: String): UUID? =
     (this[name] as? UUID)
+
+fun Map<String, Any?>.byteArray(name: String): ByteArray = this.byteArrayOrNull(name)!!
+
+fun Map<String, Any?>.byteArrayOrNull(name: String): ByteArray? =
+    (this[name] as? ByteBuffer)?.array()
