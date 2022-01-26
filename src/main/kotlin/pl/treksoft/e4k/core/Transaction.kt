@@ -24,12 +24,14 @@ package pl.treksoft.e4k.core
 
 import org.springframework.r2dbc.connection.R2dbcTransactionManager
 import org.springframework.transaction.ReactiveTransaction
+import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 
 suspend fun <T : Any> DbClient.withTransaction(
+    transactionDefinition: TransactionDefinition = TransactionDefinition.withDefaults(),
     block: suspend (ReactiveTransaction) -> T?
 ): T? {
     val tm = R2dbcTransactionManager(this.databaseClient.connectionFactory)
-    return TransactionalOperator.create(tm).executeAndAwait(block)
+    return TransactionalOperator.create(tm, transactionDefinition).executeAndAwait(block)
 }
