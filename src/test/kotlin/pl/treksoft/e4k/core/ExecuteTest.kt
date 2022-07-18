@@ -45,8 +45,9 @@ open class ExecuteTest : SqlTest() {
         runBlocking {
             val count = dbClient.execute<Int>("SELECT COUNT(*) FROM users").fetch().awaitOne()
             assertEquals(1, count, "should return number of records")
-            val id = dbClient.execute<Int>("SELECT user_id FROM users WHERE username = :username").bind("username", "jsmith")
-                .fetch().awaitOne()
+            val id =
+                dbClient.execute<Int>("SELECT user_id FROM users WHERE username = :username").bind("username", "jsmith")
+                    .fetch().awaitOne()
             assertTrue(id > 0, "should return correct id of the user")
             val map = dbClient.execute("SELECT name, description FROM users WHERE username = :username")
                 .bind("username", "jsmith").fetch().awaitOne()

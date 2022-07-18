@@ -25,7 +25,7 @@ package pl.treksoft.e4k.core
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.annotation.Id
-import org.springframework.r2dbc.core.await
+import org.springframework.r2dbc.core.awaitRowsUpdated
 import java.time.OffsetDateTime
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -69,7 +69,7 @@ open class SqlTest {
                       PRIMARY KEY (logs_id)
                     );
                 """.trimIndent()
-            ).await()
+            ).fetch().awaitRowsUpdated()
         }
     }
 
@@ -81,7 +81,7 @@ open class SqlTest {
                     DROP TABLE users;
                     DROP TABLE logs;
                 """.trimIndent()
-            ).await()
+            ).fetch().awaitRowsUpdated()
         }
     }
 

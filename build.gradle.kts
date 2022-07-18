@@ -5,7 +5,7 @@ plugins {
     id("maven-publish")
     id("signing")
     id("io.github.gradle-nexus.publish-plugin")
-    id("org.jetbrains.dokka") version "1.6.0"
+    id("org.jetbrains.dokka") version "1.7.10"
 }
 
 repositories()
@@ -53,9 +53,6 @@ publishing {
             from(components["kotlin"])
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
-            pom {
-                defaultPom()
-            }
         }
     }
 }
