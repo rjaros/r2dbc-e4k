@@ -102,7 +102,7 @@ open class UpdateTest : SqlTest() {
             assertEquals("pass", changedUser.password)
             assertEquals("John Smith", changedUser.name)
             assertEquals("description", changedUser.description)
-            assertEquals(now, changedUser.createdAt)
+            assertEquals(now.withNano(0), changedUser.createdAt?.withNano(0))
             assertEquals(true, changedUser.active)
         }
     }

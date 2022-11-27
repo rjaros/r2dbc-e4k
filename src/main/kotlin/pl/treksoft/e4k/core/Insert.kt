@@ -22,11 +22,11 @@
 
 package pl.treksoft.e4k.core
 
+import io.r2dbc.spi.Parameters
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.data.r2dbc.core.ReactiveInsertOperation
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.FetchSpec
-import org.springframework.r2dbc.core.Parameter
 import org.springframework.r2dbc.core.RowsFetchSpec
 import org.springframework.r2dbc.core.awaitOne
 import reactor.core.publisher.Mono
@@ -85,7 +85,7 @@ private class InsertValuesSpecImpl(
     }
 
     override fun value(field: String, value: Any?, type: Class<*>): InsertValuesSpec {
-        values[field] = Parameter.fromOrEmpty(value, type)
+        values[field] = if (value != null) Parameters.`in`(value) else Parameters.`in`(type)
         return this
     }
 
@@ -95,7 +95,7 @@ private class InsertValuesSpecImpl(
     }
 
     override fun nullValue(field: String, type: Class<*>): InsertValuesSpec {
-        values[field] = Parameter.empty(type)
+        values[field] = Parameters.`in`(type)
         return this
     }
 
@@ -150,7 +150,7 @@ private class InsertValuesKeySpecImpl(
     }
 
     override fun value(field: String, value: Any?, type: Class<*>): InsertValuesKeySpec {
-        values[field] = Parameter.fromOrEmpty(value, type)
+        values[field] = if (value != null) Parameters.`in`(value) else Parameters.`in`(type)
         return this
     }
 
@@ -160,7 +160,7 @@ private class InsertValuesKeySpecImpl(
     }
 
     override fun nullValue(field: String, type: Class<*>): InsertValuesKeySpec {
-        values[field] = Parameter.empty(type)
+        values[field] = Parameters.`in`(type)
         return this
     }
 

@@ -11,7 +11,6 @@ import org.gradle.plugins.signing.SigningExtension
 fun Project.repositories() {
     repositories {
         mavenCentral()
-        jcenter()
         mavenLocal()
     }
 }

@@ -22,13 +22,13 @@
 
 package pl.treksoft.e4k.core
 
+import io.r2dbc.spi.Parameters
 import org.springframework.data.r2dbc.core.ReactiveUpdateOperation
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query.query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.FetchSpec
-import org.springframework.r2dbc.core.Parameter
 import pl.treksoft.e4k.query.Query
 import reactor.core.publisher.Mono
 
@@ -48,7 +48,7 @@ inline fun <reified T : Any> UpdateTableSpec.table(): ReactiveUpdateOperation.Re
 inline fun <reified T : Any> ReactiveUpdateOperation.UpdateWithQuery.using(
     obj: T,
     dbClient: DbClient
-): Mono<Int> {
+): Mono<Long> {
     val dataAccessStrategy = dbClient.r2dbcEntityTemplate.dataAccessStrategy
     val idColumns = dbClient.r2dbcEntityTemplate.dataAccessStrategy.getIdentifierColumns(T::class.java)
     if (idColumns.isEmpty()) throw IllegalStateException("Identifier columns not declared")
@@ -140,7 +140,7 @@ private class UpdateValuesSpecImpl(
     }
 
     override fun set(field: String, value: Any?, type: Class<*>): UpdateValuesSpec {
-        values[field] = Parameter.fromOrEmpty(value, type)
+        values[field] = if (value != null) Parameters.`in`(value) else Parameters.`in`(type)
         return this
     }
 

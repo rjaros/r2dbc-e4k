@@ -22,8 +22,9 @@
 
 package pl.treksoft.e4k.core
 
+import io.r2dbc.spi.Parameter
+import io.r2dbc.spi.Parameters
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.r2dbc.core.Parameter
 import org.springframework.r2dbc.core.RowsFetchSpec
 import pl.treksoft.e4k.query.Query
 import kotlin.reflect.KClass
@@ -35,7 +36,11 @@ fun DatabaseClient.GenericExecuteSpec.bindMap(parameters: Map<String, Any?>): Da
         } else if (entry.value is Parameter) {
             spec.bind(entry.key, entry.value!! as Parameter)
         } else {
-            spec.bind(entry.key, Parameter.fromOrEmpty(entry.value, entry.value!!::class.java))
+            val parameter = if (entry.value != null)
+                Parameters.`in`(entry.value!!)
+            else
+                Parameters.`in`(entry.value!!::class.java)
+            spec.bind(entry.key, parameter)
         }
     }
 }
@@ -47,7 +52,11 @@ fun DatabaseClient.GenericExecuteSpec.bindIndexedMap(parameters: Map<Int, Any?>)
         } else if (entry.value is Parameter) {
             spec.bind(entry.key, entry.value!! as Parameter)
         } else {
-            spec.bind(entry.key, Parameter.fromOrEmpty(entry.value, entry.value!!::class.java))
+            val parameter = if (entry.value != null)
+                Parameters.`in`(entry.value!!)
+            else
+                Parameters.`in`(entry.value!!::class.java)
+            spec.bind(entry.key, parameter)
         }
     }
 }
@@ -85,10 +94,10 @@ inline fun <T : Any, reified V : Any> BindSpec<T>.bindNullable(name: String, val
     bind(name, value, V::class.java)
 
 inline fun <reified T : Any> DatabaseClient.GenericExecuteSpec.bindNullable(index: Int, value: T? = null) =
-    bind(index, Parameter.fromOrEmpty(value, T::class.java))
+    bind(index, if (value != null) Parameters.`in`(value) else Parameters.`in`(T::class.java))
 
 inline fun <reified T : Any> DatabaseClient.GenericExecuteSpec.bindNullable(name: String, value: T? = null) =
-    bind(name, Parameter.fromOrEmpty(value, T::class.java))
+    bind(name, if (value != null) Parameters.`in`(value) else Parameters.`in`(T::class.java))
 
 @PublishedApi
 internal class BindSpecImpl<T : Any>(
@@ -106,12 +115,12 @@ internal class BindSpecImpl<T : Any>(
     }
 
     override fun bind(index: Int, value: Any?, type: Class<*>): BindSpec<T> {
-        indexedParameters[index] = Parameter.fromOrEmpty(value, type)
+        indexedParameters[index] = if (value != null) Parameters.`in`(value) else Parameters.`in`(type)
         return this
     }
 
     override fun bindNull(index: Int, type: Class<*>): BindSpec<T> {
-        indexedParameters[index] = Parameter.empty(type)
+        indexedParameters[index] = Parameters.`in`(type)
         return this
     }
 
@@ -121,12 +130,12 @@ internal class BindSpecImpl<T : Any>(
     }
 
     override fun bind(name: String, value: Any?, type: Class<*>): BindSpec<T> {
-        namedParameters[name] = Parameter.fromOrEmpty(value, type)
+        namedParameters[name] = if (value != null) Parameters.`in`(value) else Parameters.`in`(type)
         return this
     }
 
     override fun bindNull(name: String, type: Class<*>): BindSpec<T> {
-        namedParameters[name] = Parameter.empty(type)
+        namedParameters[name] = Parameters.`in`(type)
         return this
     }
 

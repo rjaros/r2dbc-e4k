@@ -23,7 +23,7 @@
  */
 package pl.treksoft.e4k.query
 
-import org.springframework.r2dbc.core.Parameter
+import io.r2dbc.spi.Parameters
 
 /**
  * QueryBuilder is a simple SQL query builder to ease building dynamic queries
@@ -59,11 +59,11 @@ class QueryBuilder {
     }
 
     fun parameter(name: String, value: Any?, type: Class<*>) {
-        params[name] = Parameter.fromOrEmpty(value, type)
+        params[name] = if (value != null) Parameters.`in`(value) else Parameters.`in`(type)
     }
 
     fun parameterNull(name: String, type: Class<*>) {
-        params[name] = Parameter.empty(type)
+        params[name] = Parameters.`in`(type)
     }
 
     fun groupBy(groupBy: String) {

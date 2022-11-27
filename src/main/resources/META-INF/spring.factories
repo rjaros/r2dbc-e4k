@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=pl.treksoft.e4k.core.DbClientConfiguration
