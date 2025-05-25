@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.21")
-    implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.21")
+    implementation("io.github.gradle-nexus:publish-plugin:2.0.0")
     implementation(gradleApi())
 }

@@ -1,11 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm")
     id("maven-publish")
     id("signing")
     id("io.github.gradle-nexus.publish-plugin")
-    id("org.jetbrains.dokka") version "1.7.20"
+    id("org.jetbrains.dokka") version "2.0.0"
 }
 
 repositories()
@@ -16,10 +14,11 @@ val springDataR2dbcVersion: String by project
 val r2dbcH2Version: String by project
 val springBootVersion: String by project
 
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions.jvmTarget = javaVersion
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions.jvmTarget = javaVersion
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+    }
+}
 
 dependencies {
     implementation(kotlin("reflect"))
@@ -42,9 +41,9 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 val javadocJar by tasks.registering(Jar::class) {
-    dependsOn("dokkaJavadoc")
+    dependsOn("dokkaGenerate")
     archiveClassifier.set("javadoc")
-    from("$buildDir/dokka/javadoc")
+    from(layout.buildDirectory.dir("dokka/html"))
 }
 
 publishing {
