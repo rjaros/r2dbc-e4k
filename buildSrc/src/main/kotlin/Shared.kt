@@ -57,8 +57,10 @@ fun Project.setupPublication() {
     extensions.getByType<NexusPublishExtension>().run {
         repositories {
             sonatype {
-                username.set(findProperty("ossrhUsername")?.toString())
-                password.set(findProperty("ossrhPassword")?.toString())
+                username.set(findProperty("mavenCentralUsername")?.toString())
+                password.set(findProperty("mavenCentralPassword")?.toString())
+                nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+                snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
             }
         }
     }
